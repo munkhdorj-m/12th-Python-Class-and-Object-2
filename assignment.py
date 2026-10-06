@@ -1,11 +1,22 @@
+# You can remove 'pass' when you start writing the class.
+# Read README.md for exactly what each class must do.
+
 # Exercise 1
-class Rectangle:
+class BusCard:
     pass
 
 # Exercise 2
-class Book:
+class Student:
     pass
 
 # Exercise 3
-class ShoppingCart:
+class Song:
+    pass
+
+
+class Playlist:
+    pass
+
+# Exercise 4
+class Fighter:
     pass
