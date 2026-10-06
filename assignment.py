@@ -16,7 +16,3 @@ class Song:
 
 class Playlist:
     pass
-
-# Exercise 4
-class Fighter:
-    pass
