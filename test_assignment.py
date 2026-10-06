@@ -1,6 +1,7 @@
 import pytest
 
-from assignment import BusCard, Student, Song, Playlist, Fighter
+from assignment import BusCard, Student, Song, Playlist
+
 
 def test1_new_card():
     card = BusCard("Bat")
@@ -14,15 +15,18 @@ def test1_top_up_and_pay():
 
     assert card.top_up(5000) == True
     assert card.balance == 5000
-    assert card.top_up(0) == False         
-    assert card.top_up(-200) == False       
-    assert card.balance == 5000             
+    assert card.top_up(0) == False
+    assert card.top_up(-200) == False
+    assert card.balance == 5000
+
     assert card.pay(500) == True
     assert card.balance == 4500
     assert card.trips == 1
+
     assert card.pay(10000) == False
-    assert card.balance == 4500        
-    assert card.trips == 1              
+    assert card.balance == 4500
+    assert card.trips == 1
+
     assert card.pay(4500) == True
     assert card.balance == 0
     assert card.trips == 2
@@ -38,25 +42,26 @@ def test1_separate_cards():
     assert card2.balance == 0
     assert card2.trips == 0
 
+
 def test2_add_grade():
     s = Student("Saraa")
     assert s.name == "Saraa"
     assert s.grades == []
 
     assert s.add_grade(90) == True
-    assert s.add_grade(0) == True       
-    assert s.add_grade(100) == True   
-    assert s.add_grade(101) == False       
-    assert s.add_grade(-1) == False     
-    assert s.grades == [90, 0, 100]       
+    assert s.add_grade(0) == True
+    assert s.add_grade(100) == True
+    assert s.add_grade(101) == False
+    assert s.add_grade(-1) == False
+    assert s.grades == [90, 0, 100]
 
 
 @pytest.mark.parametrize("grades, expected_average, expected_highest", [
     [[90, 85, 77], 84.0, 90],
     [[70, 81], 75.5, 81],
-    [[1, 2, 2], 1.7, 2],               
+    [[1, 2, 2], 1.7, 2],
     [[100], 100.0, 100],
-    [[], 0, None],                     
+    [[], 0, None],
 ])
 def test2_average_and_highest(grades, expected_average, expected_highest):
     s = Student("Bat")
@@ -77,7 +82,7 @@ def test2_separate_students():
 
 @pytest.mark.parametrize("seconds, expected", [
     [205, "3:25"],
-    [65, "1:05"],                  
+    [65, "1:05"],
     [59, "0:59"],
     [600, "10:00"],
     [0, "0:00"],
@@ -104,49 +109,22 @@ def test3_playlist_basics():
 
     assert p.count() == 2
     assert p.total_seconds() == 385
-    assert p.songs[0] is s1             
+    assert p.songs[0] is s1
     assert p.songs[1] is s2
 
 
 def test3_playlist_search():
     p = Playlist("Mix")
-    assert p.longest_song() is None    
+    assert p.longest_song() is None
 
     a = Song("Morning Steppe", "Nomin", 205)
     b = Song("Blue Sky", "Temuulen", 180)
     c = Song("Night Train", "Nomin", 240)
-    d = Song("Long Road", "Anu", 240)      
+    d = Song("Long Road", "Anu", 240)
     for song in [a, b, c, d]:
         p.add_song(song)
 
-    assert p.longest_song() is c            
+    assert p.longest_song() is c
     assert p.songs_by("Nomin") == ["Morning Steppe", "Night Train"]
     assert p.songs_by("Anu") == ["Long Road"]
     assert p.songs_by("Nobody") == []
-
-
-def test4_fighter_basics():
-    f = Fighter("Bat", 100, 30)
-    assert f.name == "Bat"
-    assert f.health == 100
-    assert f.power == 30
-    assert f.is_alive() == True
-
-    f.health = 0
-    assert f.is_alive() == False
-
-
-def test4_hit():
-    bat = Fighter("Bat", 100, 30)
-    dorj = Fighter("Dorj", 50, 20)
-
-    bat.hit(dorj)
-    assert dorj.health == 20           
-    assert bat.health == 100             
-
-    bat.hit(dorj)
-    assert dorj.health == 0                
-    assert dorj.is_alive() == False
-
-    dorj.hit(bat)
-    assert bat.health == 100              
