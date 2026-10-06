@@ -1,45 +1,179 @@
 import pytest
-from assignment import Rectangle, Book, ShoppingCart
 
-@pytest.mark.parametrize("length, width, expected_area, expected_perimeter", [
-    (5, 3, 15, 16),   # normal case
-    (10, 2, 20, 24),  # different ratio
-    (1, 1, 1, 4),     # square
-    (0, 5, 0, 10),    # zero length edge case
+from assignment import BusCard, Student, Song, Playlist, Fighter
+
+
+# =============================================================================
+# Exercise 1: BusCard
+# =============================================================================
+
+def test1_new_card():
+    card = BusCard("Bat")
+    assert card.owner == "Bat"
+    assert card.balance == 0
+    assert card.trips == 0
+
+
+def test1_top_up_and_pay():
+    card = BusCard("Bat")
+
+    # top up
+    assert card.top_up(5000) == True
+    assert card.balance == 5000
+    assert card.top_up(0) == False          # zero is not allowed
+    assert card.top_up(-200) == False       # negative is not allowed
+    assert card.balance == 5000             # nothing changed
+
+    # pay a fare
+    assert card.pay(500) == True
+    assert card.balance == 4500
+    assert card.trips == 1
+
+    # not enough money
+    assert card.pay(10000) == False
+    assert card.balance == 4500             # nothing changed
+    assert card.trips == 1                  # nothing changed
+
+    # paying exactly the whole balance is allowed
+    assert card.pay(4500) == True
+    assert card.balance == 0
+    assert card.trips == 2
+
+
+def test1_separate_cards():
+    # Every object must have its OWN balance and trips.
+    card1 = BusCard("Bat")
+    card2 = BusCard("Saraa")
+    card1.top_up(3000)
+    card1.pay(500)
+    assert card1.balance == 2500
+    assert card1.trips == 1
+    assert card2.balance == 0
+    assert card2.trips == 0
+
+
+# =============================================================================
+# Exercise 2: Student
+# =============================================================================
+
+def test2_add_grade():
+    s = Student("Saraa")
+    assert s.name == "Saraa"
+    assert s.grades == []
+
+    assert s.add_grade(90) == True
+    assert s.add_grade(0) == True           # 0 is allowed
+    assert s.add_grade(100) == True         # 100 is allowed
+    assert s.add_grade(101) == False        # too high
+    assert s.add_grade(-1) == False         # too low
+    assert s.grades == [90, 0, 100]         # the bad ones were NOT added
+
+
+@pytest.mark.parametrize("grades, expected_average, expected_highest", [
+    [[90, 85, 77], 84.0, 90],
+    [[70, 81], 75.5, 81],
+    [[1, 2, 2], 1.7, 2],                    # 1.666... rounds to 1.7
+    [[100], 100.0, 100],
+    [[], 0, None],                          # no grades yet
 ])
-def test1(length, width, expected_area, expected_perimeter):
-    rect = Rectangle(length, width)
-    assert rect.area() == expected_area
-    assert rect.perimeter() == expected_perimeter
+def test2_average_and_highest(grades, expected_average, expected_highest):
+    s = Student("Bat")
+    for grade in grades:
+        s.add_grade(grade)
+    assert s.average() == expected_average
+    assert s.highest() == expected_highest
 
-@pytest.mark.parametrize("title, author, price, expected_output", [
-    ("Python Basics", "Alice", 29.99, "Title: Python Basics, Author: Alice, Price: $29.99"),
-    ("AI Guide", "Bob", 45.5, "Title: AI Guide, Author: Bob, Price: $45.5"),
-    ("Data Science", "Charlie", 0, "Title: Data Science, Author: Charlie, Price: $0"),
+
+def test2_separate_students():
+    # Every Student must have its OWN list of grades.
+    s1 = Student("Bat")
+    s2 = Student("Saraa")
+    s1.add_grade(95)
+    s1.add_grade(80)
+    assert s1.grades == [95, 80]
+    assert s2.grades == []
+
+
+# =============================================================================
+# Exercise 3: Song and Playlist
+# =============================================================================
+
+@pytest.mark.parametrize("seconds, expected", [
+    [205, "3:25"],
+    [65, "1:05"],                           # seconds always have 2 digits
+    [59, "0:59"],
+    [600, "10:00"],
+    [0, "0:00"],
 ])
-def test2(title, author, price, expected_output):
-    book = Book(title, author, price)
-    assert book.display() == expected_output
+def test3_song(seconds, expected):
+    song = Song("Morning Steppe", "Nomin", seconds)
+    assert song.title == "Morning Steppe"
+    assert song.artist == "Nomin"
+    assert song.seconds == seconds
+    assert song.length() == expected
 
-def test3_1():
-    cart = ShoppingCart()
-    cart.add_item("Apple", 1.5)
-    cart.add_item("Banana", 2.0)
-    cart.add_item("Book", 10.0)
-    assert cart.total_price() == pytest.approx(13.5)
 
-@pytest.mark.parametrize("items, expected_output, expected_total", [
-    ([("Pen", 2), ("Notebook", 5)], "Pen: $2\nNotebook: $5", 7),
-    ([("Milk", 3.5)], "Milk: $3.5", 3.5),
-    ([("A", 1), ("B", 2), ("C", 3)], "A: $1\nB: $2\nC: $3", 6),
-])
-def test3_2(items, expected_output, expected_total):
-    cart = ShoppingCart()
-    for name, price in items:
-        cart.add_item(name, price)
+def test3_playlist_basics():
+    p = Playlist("Road Trip")
+    assert p.name == "Road Trip"
+    assert p.songs == []
+    assert p.count() == 0
+    assert p.total_seconds() == 0
 
-    actual_output = cart.show_items().strip()  
-    expected_output = expected_output.strip()  
+    s1 = Song("Morning Steppe", "Nomin", 205)
+    s2 = Song("Blue Sky", "Temuulen", 180)
+    p.add_song(s1)
+    p.add_song(s2)
 
-    assert actual_output == expected_output
-    assert cart.total_price() == expected_total
+    assert p.count() == 2
+    assert p.total_seconds() == 385
+    assert p.songs[0] is s1                 # the Song OBJECT is stored
+    assert p.songs[1] is s2
+
+
+def test3_playlist_search():
+    p = Playlist("Mix")
+    assert p.longest_song() is None         # empty playlist
+
+    a = Song("Morning Steppe", "Nomin", 205)
+    b = Song("Blue Sky", "Temuulen", 180)
+    c = Song("Night Train", "Nomin", 240)
+    d = Song("Long Road", "Anu", 240)       # same length as c, added later
+    for song in [a, b, c, d]:
+        p.add_song(song)
+
+    assert p.longest_song() is c            # tie -> the one added first
+    assert p.songs_by("Nomin") == ["Morning Steppe", "Night Train"]
+    assert p.songs_by("Anu") == ["Long Road"]
+    assert p.songs_by("Nobody") == []
+
+
+# =============================================================================
+# Exercise 4: Fighter
+# =============================================================================
+
+def test4_fighter_basics():
+    f = Fighter("Bat", 100, 30)
+    assert f.name == "Bat"
+    assert f.health == 100
+    assert f.power == 30
+    assert f.is_alive() == True
+
+    f.health = 0
+    assert f.is_alive() == False
+
+
+def test4_hit():
+    bat = Fighter("Bat", 100, 30)
+    dorj = Fighter("Dorj", 50, 20)
+
+    bat.hit(dorj)
+    assert dorj.health == 20                # 50 - 30
+    assert bat.health == 100                # the attacker is not hurt
+
+    bat.hit(dorj)
+    assert dorj.health == 0                 # NOT -10: health never goes below 0
+    assert dorj.is_alive() == False
+
+    dorj.hit(bat)
+    assert bat.health == 100                # a knocked-out fighter cannot hit
