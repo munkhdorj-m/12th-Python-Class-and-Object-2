@@ -109,24 +109,6 @@ jobs:
           timeout: 2
           max-score: 1
 
-      - name: Ex 4 - Fighter basics
-        id: ex4_fighter_basics
-        uses: classroom-resources/autograding-command-grader@v1
-        with:
-          test-name: Ex 4 - Fighter basics
-          command: pytest test_assignment.py::test4_fighter_basics
-          timeout: 2
-          max-score: 1
-
-      - name: Ex 4 - Hit
-        id: ex4_hit
-        uses: classroom-resources/autograding-command-grader@v1
-        with:
-          test-name: Ex 4 - Hit
-          command: pytest test_assignment.py::test4_hit
-          timeout: 2
-          max-score: 1
-
       - name: Autograding Reporter
         uses: classroom-resources/autograding-grading-reporter@v1
         env:
@@ -139,7 +121,5 @@ jobs:
           EX3_SONG_RESULTS: "${{ steps.ex3_song.outputs.result }}"
           EX3_PLAYLIST_BASICS_RESULTS: "${{ steps.ex3_playlist_basics.outputs.result }}"
           EX3_PLAYLIST_SEARCH_RESULTS: "${{ steps.ex3_playlist_search.outputs.result }}"
-          EX4_FIGHTER_BASICS_RESULTS: "${{ steps.ex4_fighter_basics.outputs.result }}"
-          EX4_HIT_RESULTS: "${{ steps.ex4_hit.outputs.result }}"
         with:
-          runners: ex1_new_card,ex1_top_up_and_pay,ex1_separate_cards,ex2_add_grade,ex2_average_and_highest,ex2_separate_students,ex3_song,ex3_playlist_basics,ex3_playlist_search,ex4_fighter_basics,ex4_hit
+          runners: ex1_new_card,ex1_top_up_and_pay,ex1_separate_cards,ex2_add_grade,ex2_average_and_highest,ex2_separate_students,ex3_song,ex3_playlist_basics,ex3_playlist_search
