@@ -1,16 +1,145 @@
-    name: GitHub Classroom Workflow
+name: Autograding Tests
 
-    on: 
-      push: 
-        paths: 
-          # Do not run workflow unless these files were modified
-          - 'assignment.py' 
-          - 'test_assignment.py' 
-    permissions: write-all
-    jobs:
-      build:
-        name: Autograding
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v2
-          - uses: education/autograding@v1
+on:
+  push:
+    paths:
+      - 'assignment.py'
+      - 'test_assignment.py'
+  workflow_dispatch:
+
+permissions:
+  checks: write
+  actions: read
+  contents: read
+
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install pytest
+        run: pip install -r requirements.txt
+
+      - name: Ex 1 - New card
+        id: ex1_new_card
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 1 - New card
+          command: pytest test_assignment.py::test1_new_card
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 1 - Top up and pay
+        id: ex1_top_up_and_pay
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 1 - Top up and pay
+          command: pytest test_assignment.py::test1_top_up_and_pay
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 1 - Separate cards
+        id: ex1_separate_cards
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 1 - Separate cards
+          command: pytest test_assignment.py::test1_separate_cards
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 2 - Add grade
+        id: ex2_add_grade
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 2 - Add grade
+          command: pytest test_assignment.py::test2_add_grade
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 2 - Average and highest
+        id: ex2_average_and_highest
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 2 - Average and highest
+          command: pytest test_assignment.py::test2_average_and_highest
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 2 - Separate students
+        id: ex2_separate_students
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 2 - Separate students
+          command: pytest test_assignment.py::test2_separate_students
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 3 - Song
+        id: ex3_song
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 3 - Song
+          command: pytest test_assignment.py::test3_song
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 3 - Playlist basics
+        id: ex3_playlist_basics
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 3 - Playlist basics
+          command: pytest test_assignment.py::test3_playlist_basics
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 3 - Playlist search
+        id: ex3_playlist_search
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 3 - Playlist search
+          command: pytest test_assignment.py::test3_playlist_search
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 4 - Fighter basics
+        id: ex4_fighter_basics
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 4 - Fighter basics
+          command: pytest test_assignment.py::test4_fighter_basics
+          timeout: 2
+          max-score: 1
+
+      - name: Ex 4 - Hit
+        id: ex4_hit
+        uses: classroom-resources/autograding-command-grader@v1
+        with:
+          test-name: Ex 4 - Hit
+          command: pytest test_assignment.py::test4_hit
+          timeout: 2
+          max-score: 1
+
+      - name: Autograding Reporter
+        uses: classroom-resources/autograding-grading-reporter@v1
+        env:
+          EX1_NEW_CARD_RESULTS: "${{ steps.ex1_new_card.outputs.result }}"
+          EX1_TOP_UP_AND_PAY_RESULTS: "${{ steps.ex1_top_up_and_pay.outputs.result }}"
+          EX1_SEPARATE_CARDS_RESULTS: "${{ steps.ex1_separate_cards.outputs.result }}"
+          EX2_ADD_GRADE_RESULTS: "${{ steps.ex2_add_grade.outputs.result }}"
+          EX2_AVERAGE_AND_HIGHEST_RESULTS: "${{ steps.ex2_average_and_highest.outputs.result }}"
+          EX2_SEPARATE_STUDENTS_RESULTS: "${{ steps.ex2_separate_students.outputs.result }}"
+          EX3_SONG_RESULTS: "${{ steps.ex3_song.outputs.result }}"
+          EX3_PLAYLIST_BASICS_RESULTS: "${{ steps.ex3_playlist_basics.outputs.result }}"
+          EX3_PLAYLIST_SEARCH_RESULTS: "${{ steps.ex3_playlist_search.outputs.result }}"
+          EX4_FIGHTER_BASICS_RESULTS: "${{ steps.ex4_fighter_basics.outputs.result }}"
+          EX4_HIT_RESULTS: "${{ steps.ex4_hit.outputs.result }}"
+        with:
+          runners: ex1_new_card,ex1_top_up_and_pay,ex1_separate_cards,ex2_add_grade,ex2_average_and_highest,ex2_separate_students,ex3_song,ex3_playlist_basics,ex3_playlist_search,ex4_fighter_basics,ex4_hit
